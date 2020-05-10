@@ -25,3 +25,7 @@ docker run -it --name simple-mongo -d -p 27017:27017 -v simple_mongodbdata:/data
 ```bash
 go run main.go
 ```
+
+## Endpoint
+
+Browse to http://localhost:1323
