@@ -55,7 +55,8 @@ func (r repository) Simple() ([]SimpleEntity, error) {
 		return result, err
 	}
 
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	cursor, err := client.
 		Database(dbName).
 		Collection(simpleColl).
@@ -79,8 +80,8 @@ func (r repository) Insert(user, name string) (SimpleEntity, error) {
 		return result, err
 	}
 
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	result = SimpleEntity{
 		ID:   primitive.NewObjectID(),
 		User: user,
@@ -104,8 +105,13 @@ func (r repository) Update(id string, ent SimpleEntity) (SimpleEntity, error) {
 		return result, err
 	}
 
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	ID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		fmt.Println(err)
+		return result, err
+	}
 	err = client.
 		Database(dbName).
 		Collection(simpleColl).
@@ -149,7 +155,8 @@ func (r repository) SimpleOne(id string) (SimpleEntity, error) {
 		return result, err
 	}
 
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	err = client.
 		Database(dbName).
 		Collection(simpleColl).
@@ -167,7 +174,8 @@ func mongoClient() (*mongo.Client, error) {
 	opts.ApplyURI(uri)
 	opts.SetMaxPoolSize(10)
 
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	if client, err = mongo.Connect(ctx, opts); err != nil {
 		fmt.Println("connect...")
 		fmt.Println(err.Error())
